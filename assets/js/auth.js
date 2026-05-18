@@ -1,5 +1,7 @@
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
+const loginMsg = document.getElementById('loginMsg');
+const signupMsg = document.getElementById('signupMsg');
 
 const withLoading = async (btn, fn) => {
   if (!btn) return fn();
@@ -9,26 +11,42 @@ const withLoading = async (btn, fn) => {
   try { await fn(); } finally { btn.disabled = false; btn.textContent = t; }
 };
 
+const emailRedirectTo = `${window.location.origin}/login.html`;
+
+async function redirectIfLoggedIn() {
+  const user = await getCurrentUser();
+  if (!user) return;
+  const admin = await isAdmin();
+  window.location.replace(admin ? 'admin.html' : 'index.html');
+}
+
 if (loginForm) {
+  redirectIfLoggedIn();
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     await withLoading(document.getElementById('loginSubmit'), async () => {
-      const { error } = await db.auth.signInWithOtp({ email });
-      loginMsg.textContent = error ? error.message : 'ส่งลิงก์เข้าสู่ระบบเรียบร้อยแล้ว';
+      const { error } = await db.auth.signInWithOtp({ email, options: { emailRedirectTo } });
+      loginMsg.textContent = error ? error.message : 'ส่งลิงก์เข้าสู่ระบบเรียบร้อยแล้ว กรุณาเปิดลิงก์บนอุปกรณ์นี้';
     });
   });
 }
+
 if (signupForm) {
+  redirectIfLoggedIn();
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
     await withLoading(document.getElementById('signupSubmit'), async () => {
-      const { error } = await db.auth.signInWithOtp({ email });
-      signupMsg.textContent = error ? error.message : 'ส่งลิงก์สมัครสมาชิกเรียบร้อยแล้ว';
+      const { error } = await db.auth.signInWithOtp({ email, options: { emailRedirectTo } });
+      signupMsg.textContent = error ? error.message : 'ส่งลิงก์สมัครสมาชิกเรียบร้อยแล้ว กรุณาเปิดลิงก์บนอุปกรณ์นี้';
     });
   });
+
   document.getElementById('googleSignup').addEventListener('click', async () => {
-    await db.auth.signInWithOAuth({ provider: 'google' });
+    await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: emailRedirectTo }
+    });
   });
 }
