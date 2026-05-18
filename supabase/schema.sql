@@ -21,10 +21,14 @@ create table if not exists public.recipes (
   id bigint generated always as identity primary key,
   title text not null,
   description text,
-  ingredients jsonb,
-  steps jsonb,
+  ingredients text,
+  brewing_steps text,
+  matcha_cost numeric(10,2) default 0,
+  selling_price numeric(10,2) default 0,
+  profit numeric(10,2) generated always as (selling_price - matcha_cost) stored,
   image_url text,
-  is_featured boolean default false,
+  category text,
+  featured boolean default false,
   created_by uuid references auth.users(id),
   created_at timestamptz default now()
 );
