@@ -11,11 +11,22 @@ let editingId = null;
 
 const formatMoney = (v) => `฿${Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+async function requireAdminAction() {
+  const admin = await isAdmin();
+  if (!admin) {
+    alert('ปฏิเสธการเข้าถึง: เฉพาะผู้ดูแลระบบ');
+    window.location.replace('index.html');
+    return false;
+  }
+  return true;
+}
+
 function previewImage() {
   imagePreview.src = recipeForm.image_url.value || 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=1200&auto=format&fit=crop';
 }
 
-function openCreateModal() {
+async function openCreateModal() {
+  if (!(await requireAdminAction())) return;
   editingId = null;
   recipeForm.reset();
   recipeForm.id.value = '';
@@ -26,6 +37,7 @@ function openCreateModal() {
 }
 
 async function loadRecipes() {
+  if (!(await requireAdminAction())) return;
   const { data, error } = await db.from('recipes').select('*').order('created_at', { ascending: false });
   if (error) {
     recipeAdminList.innerHTML = `<div class='alert alert-warning'>ไม่สามารถโหลดสูตรได้: ${error.message}</div>`;
@@ -58,6 +70,7 @@ async function loadRecipes() {
 }
 
 window.editRecipe = async (id) => {
+  if (!(await requireAdminAction())) return;
   const { data } = await db.from('recipes').select('*').eq('id', id).single();
   if (!data) return;
   editingId = id;
@@ -69,11 +82,13 @@ window.editRecipe = async (id) => {
 };
 
 window.toggleFeatured = async (id, current) => {
+  if (!(await requireAdminAction())) return;
   await db.from('recipes').update({ featured: !current }).eq('id', id);
   loadRecipes();
 };
 
 window.deleteRecipe = async (id) => {
+  if (!(await requireAdminAction())) return;
   if (!confirm('ยืนยันการลบสูตรนี้?')) return;
   await db.from('recipes').delete().eq('id', id);
   loadRecipes();
@@ -81,6 +96,8 @@ window.deleteRecipe = async (id) => {
 
 recipeForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!(await requireAdminAction())) return;
+
   const payload = {
     title: recipeForm.title.value.trim(),
     description: recipeForm.description.value.trim(),
@@ -93,9 +110,11 @@ recipeForm?.addEventListener('submit', async (e) => {
     category: recipeForm.category.value.trim(),
     featured: recipeForm.featured.checked,
   };
+
   let error;
   if (editingId) ({ error } = await db.from('recipes').update(payload).eq('id', editingId));
   else ({ error } = await db.from('recipes').insert(payload));
+
   if (error) return alert(error.message);
   recipeModal.hide();
   loadRecipes();
@@ -105,10 +124,9 @@ recipeForm?.image_url.addEventListener('input', previewImage);
 document.getElementById('newRecipeBtn')?.addEventListener('click', openCreateModal);
 
 (async () => {
-  const { data: { user } } = await db.auth.getUser();
-  const isAdmin = !!(user?.email && user.email.endsWith('@admin.matcha'));
-  gateMsg.textContent = isAdmin ? 'สิทธิ์ผู้ดูแลระบบพร้อมใช้งาน' : 'ปฏิเสธการเข้าถึง: เฉพาะ admin';
-  if (isAdmin) {
+  const admin = await isAdmin();
+  gateMsg.textContent = admin ? 'สิทธิ์ผู้ดูแลระบบพร้อมใช้งาน' : 'ปฏิเสธการเข้าถึง: เฉพาะ admin';
+  if (admin) {
     adminContent.classList.remove('d-none');
     await loadRecipes();
   }
