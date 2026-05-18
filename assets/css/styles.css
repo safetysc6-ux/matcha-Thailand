@@ -1,0 +1,23 @@
+:root{--matcha:#1f4a3a;--matcha-dark:#16372b;--cream:#f8f3e7;--beige:#e9dfcc;--charcoal:#1a1a1a;--card:#fffdf8}
+body{font-family:'Noto Sans Thai',sans-serif;background:linear-gradient(180deg,var(--cream),#f5efdf);color:var(--charcoal);scroll-behavior:smooth;padding-bottom:86px}
+.hero-title,.section-title,.brand-mark{font-family:'Playfair Display',serif}
+.glass-nav{backdrop-filter:blur(10px);background:rgba(248,243,231,.78);border-bottom:1px solid rgba(31,74,58,.1)}
+.brand-mark{letter-spacing:.12em;color:var(--matcha)!important;font-weight:700}
+.hero-section{min-height:96vh;background:radial-gradient(circle at top right,#2e6b54,transparent 45%),var(--matcha);color:var(--cream);padding-top:90px}
+.eyebrow{text-transform:uppercase;letter-spacing:.18em;opacity:.82;font-size:.75rem}
+.text-cream-80{color:rgba(248,243,231,.86)}
+.btn-premium{background:var(--cream);color:var(--matcha-dark);border-radius:999px;padding:.8rem 1.4rem;font-weight:700}
+.btn-premium:hover{background:#fff;transform:translateY(-1px)}
+.btn-outline-premium{border:1px solid rgba(248,243,231,.7);color:var(--cream);border-radius:999px;padding:.8rem 1.4rem}
+.btn-soft{background:rgba(248,243,231,.16);color:var(--cream);border-radius:999px}
+.hero-card img{box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.section-space{padding:4.5rem 0}
+.premium-card{background:var(--card);border:1px solid rgba(31,74,58,.12);border-radius:1.2rem;box-shadow:0 10px 30px rgba(37,34,25,.08);transition:.3s}
+.premium-card:hover{transform:translateY(-5px)}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;background:#fffdf6;display:flex;justify-content:space-around;padding:.55rem .4rem .6rem;border-top:1px solid rgba(31,74,58,.15);z-index:1030}
+.bottom-nav a{color:#547666;text-decoration:none;font-size:.72rem;display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.25rem .55rem;border-radius:.8rem}
+.bottom-nav a.active{background:var(--beige);color:var(--matcha-dark)}
+.form-shell{max-width:520px;margin:120px auto 30px;background:var(--card);padding:1.6rem;border-radius:1.2rem;box-shadow:0 12px 30px rgba(0,0,0,.08)}
+.calc-output{background:#f2ebdc;border-radius:1rem;padding:.9rem}
+.admin-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:992px){body{padding-bottom:0}.bottom-nav{display:none}.admin-grid{grid-template-columns:1fr 1fr}}

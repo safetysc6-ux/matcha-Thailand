@@ -1,11 +1,95 @@
-<!doctype html><html lang="th"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Matcha Thailand</title>
-<script src="https://cdn.tailwindcss.com"></script><script>tailwind.config={theme:{extend:{colors:{matcha:{50:'#f4f8f1',100:'#e8f0e2',500:'#5f7d4e',700:'#2f4a34'},cream:'#f8f3e8',charcoal:'#222222',beige:'#e6dac8'},boxShadow:{soft:'0 8px 30px rgba(34,34,34,.08)'}}}}</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script defer src="app.js"></script></head>
-<body class="bg-cream text-charcoal pb-28"><main class="max-w-md mx-auto px-5">
-<section class="pt-10 pb-8 fade-section opacity-0 translate-y-5 transition-all duration-700"><p class="text-sm tracking-[.2em] text-matcha-700">KYOTO INSPIRED</p><h1 class="text-4xl font-semibold mt-3 leading-tight">มัทฉะพรีเมียม เพื่อคนไทยที่รักความละเมียด</h1><p class="mt-4 text-stone-600">แพลตฟอร์มสูตร เครื่องดื่ม และต้นทุน สำหรับร้านและคนทำมัทฉะอย่างมืออาชีพ</p><div class="mt-6 grid grid-cols-1 gap-3"><a href="calculator.html" class="rounded-2xl bg-matcha-700 text-white py-3 text-center shadow-soft">เริ่มคำนวณต้นทุน</a><a href="recipes.html" class="rounded-2xl bg-white py-3 text-center shadow-soft">ดูสูตรมัทฉะ</a><a href="admin.html" class="rounded-2xl bg-charcoal text-white py-3 text-center shadow-soft">ซื้อสินค้า</a></div></section>
-<section class="fade-section opacity-0 translate-y-5 transition-all duration-700 delay-100 bg-white rounded-3xl p-5 shadow-soft"><h2 class="text-xl font-medium">Featured Matcha</h2><p class="text-sm text-stone-600 mt-2">Uji ceremonial grade, คาแรกเตอร์นุ่ม ละมุน และหวานปลาย</p><div class="mt-4 h-36 rounded-2xl bg-gradient-to-br from-matcha-100 to-beige"></div></section>
-<section class="mt-6 fade-section opacity-0 translate-y-5 transition-all duration-700 delay-150"><h2 class="text-xl font-medium mb-3">Product Showcase</h2><div class="space-y-3"><div class="bg-white p-4 rounded-2xl shadow-soft">Chasen Bamboo Whisk</div><div class="bg-white p-4 rounded-2xl shadow-soft">Ceramic Matcha Bowl</div></div></section>
-<section class="mt-6 fade-section opacity-0 translate-y-5 transition-all duration-700 delay-200"><h2 class="text-xl font-medium mb-3">Recipe Showcase</h2><div class="bg-white p-4 rounded-2xl shadow-soft"><p class="font-medium">Iced Usucha Latte</p><p class="text-sm text-stone-600">มัทฉะ 2g • นม 120ml • น้ำ 40ml</p></div></section>
-</main>
-<nav id="bottom-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/90 backdrop-blur rounded-2xl p-3 shadow-soft flex justify-around text-sm"><a data-page="index.html" href="index.html" class="text-stone-500">Home</a><a data-page="calculator.html" href="calculator.html" class="text-stone-500">Cost</a><a data-page="recipes.html" href="recipes.html" class="text-stone-500">Recipes</a><a data-page="admin.html" href="admin.html" class="text-stone-500">Admin</a></nav>
-</body></html>
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matcha Thailand | Premium Matcha Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top glass-nav py-3">
+    <div class="container">
+      <a class="navbar-brand brand-mark" href="index.html">MATCHA TH</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto gap-2">
+          <li class="nav-item"><a class="nav-link" href="recipes.html">สูตร</a></li>
+          <li class="nav-item"><a class="nav-link" href="calculator.html">คำนวณต้นทุน</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">เข้าสู่ระบบ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section d-flex align-items-center">
+    <div class="container text-center text-lg-start">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7" data-aos="fade-up">
+          <p class="eyebrow">Kyoto Inspired • Crafted for Thailand</p>
+          <h1 class="display-4 hero-title">สัมผัสประสบการณ์มัทฉะพรีเมียม ที่เรียบง่ายแต่ทรงพลัง</h1>
+          <p class="lead text-cream-80">แพลตฟอร์มสำหรับคนรักมัทฉะและเจ้าของร้านกาแฟ ที่อยากคุมต้นทุน แชร์สูตร และเติบโตอย่างมีสไตล์</p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a href="calculator.html" class="btn btn-premium">เริ่มคำนวณต้นทุน</a>
+            <a href="recipes.html" class="btn btn-outline-premium">ดูสูตรมัทฉะ</a>
+            <a href="#products" class="btn btn-soft">ซื้อสินค้า</a>
+          </div>
+        </div>
+        <div class="col-lg-5" data-aos="fade-left" data-aos-delay="200">
+          <div class="hero-card">
+            <img src="https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=900&auto=format&fit=crop" class="img-fluid rounded-4" alt="matcha">
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section-space">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up">
+          <div class="premium-card p-4 h-100"><i class="bi bi-cup-hot fs-2"></i><h5 class="mt-3">Matcha Introduction</h5><p>รู้จักเกรดมัทฉะ แหล่งปลูก และการสกัดรสชาติให้กลมกล่อม</p></div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="premium-card p-4 h-100"><i class="bi bi-graph-up-arrow fs-2"></i><h5 class="mt-3">Smart Costing</h5><p>คำนวณต้นทุนแบบเรียลไทม์ พร้อมมองเห็นกำไรต่อแก้วทันที</p></div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="premium-card p-4 h-100"><i class="bi bi-journal-richtext fs-2"></i><h5 class="mt-3">Recipe Community</h5><p>ค้นหาและแบ่งปันสูตรเมนูมัทฉะที่ลูกค้าชอบที่สุด</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="products" class="section-space pt-0">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Featured Products</h2>
+      <div class="row g-4 mt-1" id="featuredProducts"></div>
+    </div>
+  </section>
+
+  <section class="section-space pt-0">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Featured Recipes</h2>
+      <div class="row g-4 mt-1" id="featuredRecipes"></div>
+    </div>
+  </section>
+
+  <nav class="bottom-nav d-lg-none">
+    <a href="index.html" class="active"><i class="bi bi-house"></i><span>หน้าแรก</span></a>
+    <a href="recipes.html"><i class="bi bi-journal"></i><span>สูตร</span></a>
+    <a href="calculator.html"><i class="bi bi-calculator"></i><span>คำนวณ</span></a>
+    <a href="login.html"><i class="bi bi-person"></i><span>บัญชี</span></a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
