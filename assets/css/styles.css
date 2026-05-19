@@ -11,14 +11,14 @@
 * { box-sizing: border-box; }
 html, body { overflow-x: hidden; }
 body {
-  font-family: 'Noto Sans Thai', sans-serif;
+  font-family: 'Zen Maru Gothic', 'M PLUS Rounded 1c', sans-serif;
   background: linear-gradient(180deg, var(--cream), #f2ead7);
   color: var(--charcoal);
   margin: 0;
   padding-bottom: 92px;
   scroll-behavior: smooth;
 }
-.hero-title,.section-title,.brand-mark,.jp-title{font-family:'Playfair Display',serif}
+.hero-title,.section-title,.brand-mark,.jp-title{font-family:'M PLUS Rounded 1c',sans-serif;font-weight:700}
 .safe-wrap{max-width:100%;overflow:hidden}
 .glass-nav{background:rgba(247,241,228,.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(20,52,42,.1)}
 .navbar-toggler{border:none}
@@ -40,7 +40,8 @@ body {
 .mobile-cta{position:sticky;bottom:88px;z-index:10;background:linear-gradient(180deg,rgba(247,241,228,0),var(--cream) 45%);padding-top:.7rem}
 .form-shell{max-width:620px;margin:95px auto 24px;background:var(--surface);padding:1.15rem;border-radius:1.2rem;border:1px solid rgba(20,52,42,.1);box-shadow:0 12px 28px rgba(0,0,0,.08)}
 .form-control,.form-select{min-height:46px}
-.calc-output{background:#efe5ce;border-radius:1rem;padding:1rem}
+.calc-output{background:linear-gradient(145deg,#fff8ea,#efe5ce);border-radius:1rem;padding:1rem;border:1px solid rgba(20,52,42,.12);box-shadow:inset 0 1px 0 #fff}
+.calc-output strong{color:var(--matcha-800);font-size:1.1rem}
 .metric{font-size:.86rem;margin:0 0 .4rem}
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:1040;background:#fffdf7;border-top:1px solid rgba(20,52,42,.15);display:flex;justify-content:space-around;padding:.42rem .35rem calc(.42rem + env(safe-area-inset-bottom))}
 .bottom-nav a{min-width:70px;display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.38rem .45rem;border-radius:.75rem;color:#496958;text-decoration:none;font-size:.71rem}

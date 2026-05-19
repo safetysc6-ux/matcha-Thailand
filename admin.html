@@ -1,8 +1,27 @@
 <!doctype html><html lang='th'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Admin Matcha</title><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'><link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css' rel='stylesheet'><link href='assets/css/styles.css' rel='stylesheet'></head><body class='admin-shell'>
 <main class='container section-space'>
 <h2 class='section-title mb-3'>Admin Matcha Studio</h2>
-<p class='mb-4 opacity-75 small' id='adminGateMsg'>กำลังตรวจสอบสิทธิ์...</p>
+<p class='mb-3 opacity-75 small'>หน้านี้ไม่แสดงในเมนูสาธารณะ ต้องเข้าโดยพิมพ์ URL โดยตรง และต้องเข้าสู่ระบบแอดมิน</p>
+
+<section class='premium-card p-3 mb-3' id='adminAuthCard'>
+  <h5 class='mb-3'>เข้าสู่ระบบแอดมิน</h5>
+  <form id='adminLoginForm' class='row g-2'>
+    <div class='col-12 col-md-5'><input class='form-control' id='adminEmail' type='email' placeholder='admin@email.com' required></div>
+    <div class='col-12 col-md-5'><input class='form-control' id='adminPassword' type='password' placeholder='รหัสผ่านแอดมิน' required></div>
+    <div class='col-12 col-md-2 d-grid'><button class='btn btn-premium' id='adminLoginBtn'>เข้าใช้งาน</button></div>
+  </form>
+  <p class='small mb-0 mt-2' id='adminAuthMsg'></p>
+</section>
+
 <div id='adminContent' class='d-none'>
+  <div class='d-flex justify-content-end mb-3'><button class='btn btn-outline-light btn-sm' id='adminLogoutBtn'><i class='bi bi-box-arrow-right me-1'></i>ออกจากระบบ</button></div>
+  <section class='premium-card p-3 mb-3'>
+    <div class='d-flex justify-content-between align-items-center mb-2'>
+      <h5 class='mb-0'>จัดการสินค้า (Product Management)</h5>
+      <button class='btn btn-premium' id='newProductBtn'><i class='bi bi-plus-circle me-1'></i>เพิ่มสินค้า</button>
+    </div>
+    <div id='productAdminList' class='mt-2'></div>
+  </section>
   <section class='premium-card p-3'>
     <div class='d-flex justify-content-between align-items-center mb-2'>
       <h5 class='mb-0'>จัดการสูตร (Recipe Management)</h5>
@@ -12,31 +31,9 @@
   </section>
 </div></main>
 
-<div class='modal fade' id='recipeModal' tabindex='-1'>
-  <div class='modal-dialog modal-dialog-scrollable modal-lg modal-fullscreen-sm-down'>
-    <div class='modal-content'>
-      <div class='modal-header'><h5 class='modal-title' id='recipeModalTitle'>เพิ่มสูตรใหม่</h5><button type='button' class='btn-close' data-bs-dismiss='modal'></button></div>
-      <form id='recipeForm'>
-        <input type='hidden' name='id'>
-        <div class='modal-body'>
-          <div class='row g-3'>
-            <div class='col-12'><label class='form-label'>ชื่อสูตร</label><input class='form-control' name='title' required></div>
-            <div class='col-12'><label class='form-label'>รายละเอียด</label><textarea class='form-control' name='description' rows='2' required></textarea></div>
-            <div class='col-12'><label class='form-label'>ส่วนผสม</label><textarea class='form-control' name='ingredients' rows='3' required></textarea></div>
-            <div class='col-12'><label class='form-label'>วิธีชง</label><textarea class='form-control' name='brewing_steps' rows='4' required></textarea></div>
-            <div class='col-6'><label class='form-label'>ต้นทุน</label><input class='form-control' type='number' step='0.01' name='matcha_cost' required></div>
-            <div class='col-6'><label class='form-label'>ราคาขาย</label><input class='form-control' type='number' step='0.01' name='selling_price' required></div>
-            <div class='col-12'><label class='form-label'>รูปภาพ (URL)</label><input class='form-control' name='image_url' placeholder='https://...'></div>
-            <div class='col-12'><img id='imagePreview' class='recipe-preview' alt='preview'></div>
-            <div class='col-8'><label class='form-label'>หมวดหมู่</label><input class='form-control' name='category' placeholder='Latte, Sparkling, Dessert'></div>
-            <div class='col-4 d-flex align-items-end'><div class='form-check form-switch mb-2'><input class='form-check-input' type='checkbox' name='featured' id='featured'><label class='form-check-label' for='featured'>Featured</label></div></div>
-          </div>
-        </div>
-        <div class='modal-footer'><button type='button' class='btn btn-outline-secondary' data-bs-dismiss='modal'>ยกเลิก</button><button class='btn btn-premium'>บันทึกสูตร</button></div>
-      </form>
-    </div>
-  </div>
-</div>
+<div class='modal fade' id='productModal' tabindex='-1'><div class='modal-dialog'><div class='modal-content'><div class='modal-header'><h5 class='modal-title' id='productModalTitle'>เพิ่มสินค้า</h5><button type='button' class='btn-close' data-bs-dismiss='modal'></button></div><form id='productForm'><div class='modal-body'><input type='hidden' name='id'><label class='form-label'>ชื่อสินค้า</label><input class='form-control mb-2' name='name' required><label class='form-label'>ราคา (ตัวเลข)</label><input class='form-control mb-2' name='price' type='number' step='0.01' required><label class='form-label'>รูปภาพ URL</label><input class='form-control' name='img' required></div><div class='modal-footer'><button type='button' class='btn btn-outline-secondary' data-bs-dismiss='modal'>ยกเลิก</button><button class='btn btn-premium'>บันทึก</button></div></form></div></div></div>
+
+<div class='modal fade' id='recipeModal' tabindex='-1'><div class='modal-dialog modal-dialog-scrollable modal-lg modal-fullscreen-sm-down'><div class='modal-content'><div class='modal-header'><h5 class='modal-title' id='recipeModalTitle'>เพิ่มสูตรใหม่</h5><button type='button' class='btn-close' data-bs-dismiss='modal'></button></div><form id='recipeForm'><input type='hidden' name='id'><div class='modal-body'><div class='row g-3'><div class='col-12'><label class='form-label'>ชื่อสูตร</label><input class='form-control' name='title' required></div><div class='col-12'><label class='form-label'>รายละเอียด</label><textarea class='form-control' name='description' rows='2' required></textarea></div><div class='col-12'><label class='form-label'>ส่วนผสม</label><textarea class='form-control' name='ingredients' rows='3' required></textarea></div><div class='col-12'><label class='form-label'>วิธีชง</label><textarea class='form-control' name='brewing_steps' rows='4' required></textarea></div><div class='col-6'><label class='form-label'>ต้นทุน</label><input class='form-control' type='number' step='0.01' name='matcha_cost' required></div><div class='col-6'><label class='form-label'>ราคาขาย</label><input class='form-control' type='number' step='0.01' name='selling_price' required></div><div class='col-12'><label class='form-label'>รูปภาพ (URL)</label><input class='form-control' name='image_url' placeholder='https://...'></div><div class='col-12'><img id='imagePreview' class='recipe-preview' alt='preview'></div><div class='col-8'><label class='form-label'>หมวดหมู่</label><input class='form-control' name='category' placeholder='Latte, Sparkling, Dessert'></div><div class='col-4 d-flex align-items-end'><div class='form-check form-switch mb-2'><input class='form-check-input' type='checkbox' name='featured' id='featured'><label class='form-check-label' for='featured'>Featured</label></div></div></div></div><div class='modal-footer'><button type='button' class='btn btn-outline-secondary' data-bs-dismiss='modal'>ยกเลิก</button><button class='btn btn-premium'>บันทึกสูตร</button></div></form></div></div></div>
 
 <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script><script src='./supabase-config.js'></script><script src='assets/js/supabase.js'></script><script src='assets/js/admin.js'></script></body></html>
