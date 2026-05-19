@@ -85,3 +85,10 @@ body {
 .detail-stats strong{font-size:.95rem;color:#173e2e}
 .detail-block{background:#faf6ed;border-radius:.9rem;padding:.85rem;line-height:1.8}
 @media (max-width:576px){.recipe-card-img{height:200px}.detail-stats{grid-template-columns:1fr}.detail-title{font-size:1.35rem}}
+
+.calc-shell{background:linear-gradient(160deg,#fffdf7,#f6efdf 52%,#efe9d7)}
+.calc-output{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;background:transparent;border:none;box-shadow:none;padding:0}
+.result-pill{background:#fff7e6;border:1px solid rgba(20,52,42,.1);border-radius:1rem;padding:.8rem .75rem;text-align:center}
+.result-pill span{display:block;font-size:.75rem;color:#5d6e63;margin-bottom:.2rem}
+.result-pill strong{font-size:1.16rem}
+@media (max-width:576px){.calc-output{grid-template-columns:1fr}}

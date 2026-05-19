@@ -20,47 +20,43 @@ function previewImage() {
   imagePreview.src = recipeForm.image_url.value || 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=1200&auto=format&fit=crop';
 }
 
-function getProducts() {
-  return JSON.parse(localStorage.getItem('matchaProducts') || '[]');
-}
-function saveProducts(products) {
-  localStorage.setItem('matchaProducts', JSON.stringify(products));
-}
-
-function loadProducts() {
-  const products = getProducts();
-  if (!products.length) {
-    productAdminList.innerHTML = "<p class='small opacity-75 mb-0'>ยังไม่มีสินค้า (หน้าแรกจะใช้ข้อมูลตัวอย่าง)</p>";
+async function loadProducts() {
+  const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
+  if (error) {
+    productAdminList.innerHTML = `<div class='alert alert-warning'>ไม่สามารถโหลดสินค้าได้: ${error.message}</div>`;
     return;
   }
-  productAdminList.innerHTML = products.map((p, idx) => `
+  if (!data.length) {
+    productAdminList.innerHTML = "<p class='small opacity-75 mb-0'>ยังไม่มีสินค้า</p>";
+    return;
+  }
+  productAdminList.innerHTML = data.map((p) => `
     <article class='recipe-admin-item'>
-      <img src='${p.img}' class='recipe-admin-thumb' alt='${p.name}'>
+      <img src='${p.image_url}' class='recipe-admin-thumb' alt='${p.name}'>
       <div class='flex-grow-1 d-flex justify-content-between align-items-start'>
-        <div><h6 class='mb-1'>${p.name}</h6><p class='small mb-0'>${p.price}</p></div>
+        <div><h6 class='mb-1'>${p.name}</h6><p class='small mb-0'>${formatMoney(p.price)}</p></div>
         <div class='d-flex gap-1'>
-          <button class='btn btn-sm btn-outline-light' onclick='editProduct(${idx})'><i class='bi bi-pencil'></i></button>
-          <button class='btn btn-sm btn-outline-danger' onclick='deleteProduct(${idx})'><i class='bi bi-trash'></i></button>
+          <button class='btn btn-sm btn-outline-light' onclick='editProduct(${p.id})'><i class='bi bi-pencil'></i></button>
+          <button class='btn btn-sm btn-outline-danger' onclick='deleteProduct(${p.id})'><i class='bi bi-trash'></i></button>
         </div>
       </div>
     </article>`).join('');
 }
 
-window.editProduct = (idx) => {
-  const p = getProducts()[idx];
-  editingProductId = idx;
+window.editProduct = async (id) => {
+  const { data } = await db.from('products').select('*').eq('id', id).single();
+  if (!data) return;
+  editingProductId = id;
   productModalTitle.textContent = 'แก้ไขสินค้า';
-  productForm.name.value = p.name;
-  productForm.price.value = p.price;
-  productForm.img.value = p.img;
+  productForm.name.value = data.name;
+  productForm.price.value = data.price;
+  productForm.img.value = data.image_url || ''; 
   productModal.show();
 };
 
-window.deleteProduct = (idx) => {
+window.deleteProduct = async (id) => {
   if (!confirm('ยืนยันการลบสินค้า?')) return;
-  const products = getProducts();
-  products.splice(idx, 1);
-  saveProducts(products);
+  await db.from('products').delete().eq('id', id);
   loadProducts();
 };
 
@@ -71,13 +67,11 @@ document.getElementById('newProductBtn')?.addEventListener('click', () => {
   productModal.show();
 });
 
-productForm?.addEventListener('submit', (e) => {
+productForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const products = getProducts();
-  const payload = { name: productForm.name.value.trim(), price: productForm.price.value.trim(), img: productForm.img.value.trim() };
-  if (editingProductId === null) products.unshift(payload);
-  else products[editingProductId] = payload;
-  saveProducts(products);
+  const payload = { name: productForm.name.value.trim(), price: Number(productForm.price.value || 0), image_url: productForm.img.value.trim() };
+  if (editingProductId === null) await db.from('products').insert(payload);
+  else await db.from('products').update(payload).eq('id', editingProductId);
   productModal.hide();
   loadProducts();
 });
@@ -87,7 +81,7 @@ async function openCreateModal() {
   recipeForm.reset();
   recipeForm.id.value = '';
   recipeForm.featured.checked = false;
-  recipeModalTitle.textContent = 'เพิ่มสูตรใหม่';
+  recipeModalTitle.textContent = 'เพิ่มบทความสูตรใหม่';
   previewImage();
   recipeModal.show();
 }
@@ -95,11 +89,11 @@ async function openCreateModal() {
 async function loadRecipes() {
   const { data, error } = await db.from('recipes').select('*').order('created_at', { ascending: false });
   if (error) {
-    recipeAdminList.innerHTML = `<div class='alert alert-warning'>ไม่สามารถโหลดสูตรได้: ${error.message}</div>`;
+    recipeAdminList.innerHTML = `<div class='alert alert-warning'>ไม่สามารถโหลดบทความสูตรได้: ${error.message}</div>`;
     return;
   }
   if (!data.length) {
-    recipeAdminList.innerHTML = "<p class='small opacity-75 mb-0'>ยังไม่มีสูตร</p>";
+    recipeAdminList.innerHTML = "<p class='small opacity-75 mb-0'>ยังไม่มีบทความสูตร</p>";
     return;
   }
 
@@ -128,7 +122,7 @@ window.editRecipe = async (id) => {
   const { data } = await db.from('recipes').select('*').eq('id', id).single();
   if (!data) return;
   editingId = id;
-  recipeModalTitle.textContent = 'แก้ไขสูตร';
+  recipeModalTitle.textContent = 'แก้ไขบทความสูตร';
   Object.entries(data).forEach(([k, v]) => { if (recipeForm[k]) recipeForm[k].value = v ?? ''; });
   recipeForm.featured.checked = !!data.featured;
   previewImage();
@@ -141,7 +135,7 @@ window.toggleFeatured = async (id, current) => {
 };
 
 window.deleteRecipe = async (id) => {
-  if (!confirm('ยืนยันการลบสูตรนี้?')) return;
+  if (!confirm('ยืนยันการลบบทความสูตรนี้?')) return;
   await db.from('recipes').delete().eq('id', id);
   loadRecipes();
 };
