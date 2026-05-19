@@ -13,12 +13,22 @@ const withLoading = async (btn, fn) => {
 
 const emailRedirectTo = `${window.location.origin}/login.html`;
 
-async function redirectIfLoggedIn() {
+const redirectToAppForAuthenticatedUser = async () => {
   const user = await getCurrentUser();
   if (!user) return;
   const admin = await isAdmin();
   window.location.replace(admin ? 'admin.html' : 'index.html');
+};
+
+async function redirectIfLoggedIn() {
+  await redirectToAppForAuthenticatedUser();
 }
+
+window.db.auth.onAuthStateChange(async (event, session) => {
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+    await redirectToAppForAuthenticatedUser();
+  }
+});
 
 if (loginForm) {
   redirectIfLoggedIn();
