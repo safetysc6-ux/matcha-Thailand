@@ -14,4 +14,17 @@ function renderFeatured(){
   if(p){p.innerHTML=sampleProducts.map(x=>`<div class='col-md-4' data-aos='fade-up'><div class='premium-card p-3 h-100'><img src='${x.img}' class='img-fluid rounded-4 mb-3'><h6>${x.name}</h6><p class='mb-0 text-success fw-bold'>${x.price}</p></div></div>`).join('')}
   if(r){r.innerHTML=sampleRecipes.map(x=>`<div class='col-md-4' data-aos='fade-up'><div class='premium-card p-4 h-100'><h6>${x.name}</h6><p class='mb-0'>${x.desc}</p></div></div>`).join('')}
 }
+function getProducts(){
+  const custom = JSON.parse(localStorage.getItem('matchaProducts') || '[]');
+  return custom.length ? custom : sampleProducts;
+}
+renderFeatured = (() => {
+  const original = renderFeatured;
+  return () => {
+    const p=document.getElementById('featuredProducts'); const r=document.getElementById('featuredRecipes');
+    const products = getProducts();
+    if(p){p.innerHTML=products.map(x=>`<div class='col-md-4' data-aos='fade-up'><div class='premium-card p-3 h-100'><img src='${x.img}' class='img-fluid rounded-4 mb-3'><h6>${x.name}</h6><p class='mb-0 text-success fw-bold'>${x.price}</p></div></div>`).join('')}
+    if(r){r.innerHTML=sampleRecipes.map(x=>`<div class='col-md-4' data-aos='fade-up'><div class='premium-card p-4 h-100'><h6>${x.name}</h6><p class='mb-0'>${x.desc}</p></div></div>`).join('')}
+  }
+})();
 renderFeatured();

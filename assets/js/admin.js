@@ -1,4 +1,3 @@
-const gateMsg = document.getElementById('adminGateMsg');
 const adminContent = document.getElementById('adminContent');
 const recipeAdminList = document.getElementById('recipeAdminList');
 const recipeModalEl = document.getElementById('recipeModal');
@@ -7,26 +6,83 @@ const recipeForm = document.getElementById('recipeForm');
 const recipeModalTitle = document.getElementById('recipeModalTitle');
 const imagePreview = document.getElementById('imagePreview');
 
+const productAdminList = document.getElementById('productAdminList');
+const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+const productForm = document.getElementById('productForm');
+const productModalTitle = document.getElementById('productModalTitle');
+
 let editingId = null;
+let editingProductId = null;
 
 const formatMoney = (v) => `฿${Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-async function requireAdminAction() {
-  const admin = await isAdmin();
-  if (!admin) {
-    alert('ปฏิเสธการเข้าถึง: เฉพาะผู้ดูแลระบบ');
-    window.location.replace('index.html');
-    return false;
-  }
-  return true;
-}
 
 function previewImage() {
   imagePreview.src = recipeForm.image_url.value || 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=1200&auto=format&fit=crop';
 }
 
+function getProducts() {
+  return JSON.parse(localStorage.getItem('matchaProducts') || '[]');
+}
+function saveProducts(products) {
+  localStorage.setItem('matchaProducts', JSON.stringify(products));
+}
+
+function loadProducts() {
+  const products = getProducts();
+  if (!products.length) {
+    productAdminList.innerHTML = "<p class='small opacity-75 mb-0'>ยังไม่มีสินค้า (หน้าแรกจะใช้ข้อมูลตัวอย่าง)</p>";
+    return;
+  }
+  productAdminList.innerHTML = products.map((p, idx) => `
+    <article class='recipe-admin-item'>
+      <img src='${p.img}' class='recipe-admin-thumb' alt='${p.name}'>
+      <div class='flex-grow-1 d-flex justify-content-between align-items-start'>
+        <div><h6 class='mb-1'>${p.name}</h6><p class='small mb-0'>${p.price}</p></div>
+        <div class='d-flex gap-1'>
+          <button class='btn btn-sm btn-outline-light' onclick='editProduct(${idx})'><i class='bi bi-pencil'></i></button>
+          <button class='btn btn-sm btn-outline-danger' onclick='deleteProduct(${idx})'><i class='bi bi-trash'></i></button>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+window.editProduct = (idx) => {
+  const p = getProducts()[idx];
+  editingProductId = idx;
+  productModalTitle.textContent = 'แก้ไขสินค้า';
+  productForm.name.value = p.name;
+  productForm.price.value = p.price;
+  productForm.img.value = p.img;
+  productModal.show();
+};
+
+window.deleteProduct = (idx) => {
+  if (!confirm('ยืนยันการลบสินค้า?')) return;
+  const products = getProducts();
+  products.splice(idx, 1);
+  saveProducts(products);
+  loadProducts();
+};
+
+document.getElementById('newProductBtn')?.addEventListener('click', () => {
+  editingProductId = null;
+  productModalTitle.textContent = 'เพิ่มสินค้า';
+  productForm.reset();
+  productModal.show();
+});
+
+productForm?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const products = getProducts();
+  const payload = { name: productForm.name.value.trim(), price: productForm.price.value.trim(), img: productForm.img.value.trim() };
+  if (editingProductId === null) products.unshift(payload);
+  else products[editingProductId] = payload;
+  saveProducts(products);
+  productModal.hide();
+  loadProducts();
+});
+
 async function openCreateModal() {
-  if (!(await requireAdminAction())) return;
   editingId = null;
   recipeForm.reset();
   recipeForm.id.value = '';
@@ -37,7 +93,6 @@ async function openCreateModal() {
 }
 
 async function loadRecipes() {
-  if (!(await requireAdminAction())) return;
   const { data, error } = await db.from('recipes').select('*').order('created_at', { ascending: false });
   if (error) {
     recipeAdminList.innerHTML = `<div class='alert alert-warning'>ไม่สามารถโหลดสูตรได้: ${error.message}</div>`;
@@ -70,7 +125,6 @@ async function loadRecipes() {
 }
 
 window.editRecipe = async (id) => {
-  if (!(await requireAdminAction())) return;
   const { data } = await db.from('recipes').select('*').eq('id', id).single();
   if (!data) return;
   editingId = id;
@@ -82,13 +136,11 @@ window.editRecipe = async (id) => {
 };
 
 window.toggleFeatured = async (id, current) => {
-  if (!(await requireAdminAction())) return;
   await db.from('recipes').update({ featured: !current }).eq('id', id);
   loadRecipes();
 };
 
 window.deleteRecipe = async (id) => {
-  if (!(await requireAdminAction())) return;
   if (!confirm('ยืนยันการลบสูตรนี้?')) return;
   await db.from('recipes').delete().eq('id', id);
   loadRecipes();
@@ -96,7 +148,6 @@ window.deleteRecipe = async (id) => {
 
 recipeForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!(await requireAdminAction())) return;
 
   const payload = {
     title: recipeForm.title.value.trim(),
@@ -123,11 +174,6 @@ recipeForm?.addEventListener('submit', async (e) => {
 recipeForm?.image_url.addEventListener('input', previewImage);
 document.getElementById('newRecipeBtn')?.addEventListener('click', openCreateModal);
 
-(async () => {
-  const admin = await isAdmin();
-  gateMsg.textContent = admin ? 'สิทธิ์ผู้ดูแลระบบพร้อมใช้งาน' : 'ปฏิเสธการเข้าถึง: เฉพาะ admin';
-  if (admin) {
-    adminContent.classList.remove('d-none');
-    await loadRecipes();
-  }
-})();
+adminContent.classList.remove('d-none');
+loadProducts();
+loadRecipes();
