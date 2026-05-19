@@ -41,3 +41,8 @@ create policy "public read products" on public.products for select using (true);
 create policy "public read recipes" on public.recipes for select using (true);
 create policy "admins manage products" on public.products for all using (exists (select 1 from public.users u where u.id = auth.uid() and u.role='admin'));
 create policy "admins manage recipes" on public.recipes for all using (exists (select 1 from public.users u where u.id = auth.uid() and u.role='admin'));
+
+
+create policy "users can read own profile" on public.users for select using (auth.uid() = id);
+create policy "users can insert own profile" on public.users for insert with check (auth.uid() = id);
+create policy "users can update own profile" on public.users for update using (auth.uid() = id) with check (auth.uid() = id);

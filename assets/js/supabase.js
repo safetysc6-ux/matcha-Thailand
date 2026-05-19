@@ -7,6 +7,32 @@ window.db = db;
 let currentProfile = null;
 let profileLoadedForUserId = null;
 
+async function ensureUserProfile() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const payload = {
+    id: user.id,
+    email: user.email || '',
+    display_name: user.user_metadata?.full_name || user.user_metadata?.name || null
+  };
+
+  const { data, error } = await db
+    .from('users')
+    .upsert(payload, { onConflict: 'id' })
+    .select('id, email, role')
+    .single();
+
+  if (error) {
+    console.warn('Cannot ensure profile:', error.message);
+    return null;
+  }
+
+  currentProfile = data || null;
+  profileLoadedForUserId = user.id;
+  return currentProfile;
+}
+
 async function getCurrentUser() {
   const { data, error } = await db.auth.getUser();
   if (error) return null;
@@ -60,7 +86,7 @@ async function ensureAdminPageAccess() {
 }
 
 async function bootstrapAuth() {
-  await getCurrentUser();
+  await ensureUserProfile();
   await applyAdminVisibility();
   await ensureAdminPageAccess();
 }
@@ -78,5 +104,6 @@ window.getCurrentUser = getCurrentUser;
 window.getCurrentRole = getCurrentRole;
 window.isAdmin = isAdmin;
 window.bootstrapAuth = bootstrapAuth;
+window.ensureUserProfile = ensureUserProfile;
 
 bootstrapAuth();
