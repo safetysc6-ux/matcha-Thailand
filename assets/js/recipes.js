@@ -26,6 +26,7 @@ function card(r, i) {
 }
 
 async function loadRecipes(category = 'ทั้งหมด') {
+  if (!window.db) { list.innerHTML = "<div class='col-12'><p class='opacity-75'>ยังไม่ได้ตั้งค่า Supabase</p></div>"; return; }
   let q = db.from('recipes').select('*').order('featured', { ascending: false }).order('created_at', { ascending: false });
   if (category !== 'ทั้งหมด') q = q.eq('category', category);
   const { data, error } = await q;
@@ -37,6 +38,7 @@ async function loadRecipes(category = 'ทั้งหมด') {
 }
 
 async function loadCategoryChips() {
+  if (!window.db) { chips.innerHTML = ''; return; }
   const { data } = await db.from('recipes').select('category').not('category', 'is', null);
   const unique = ['ทั้งหมด', ...new Set((data || []).map((x) => x.category).filter(Boolean))];
   chips.innerHTML = unique.map((c, i) => `<button class='btn ${i === 0 ? 'btn-premium' : 'btn-outline-dark'} recipe-chip' data-category='${c}'>${c}</button>`).join('');

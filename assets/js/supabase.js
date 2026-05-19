@@ -1,109 +1,77 @@
-const db = window.db || window.supabase.createClient(
-  window.SUPABASE_URL,
-  window.SUPABASE_ANON_KEY
-);
-window.db = db;
+(function () {
+  const supabaseLib = window.supabase;
+  const url = window.SUPABASE_URL;
+  const anon = window.SUPABASE_ANON_KEY;
 
-let currentProfile = null;
-let profileLoadedForUserId = null;
-
-async function ensureUserProfile() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-
-  const payload = {
-    id: user.id,
-    email: user.email || '',
-    display_name: user.user_metadata?.full_name || user.user_metadata?.name || null
-  };
-
-  const { data, error } = await db
-    .from('users')
-    .upsert(payload, { onConflict: 'id' })
-    .select('id, email, role')
-    .single();
-
-  if (error) {
-    console.warn('Cannot ensure profile:', error.message);
-    return null;
+  let db = window.db || null;
+  if (!db && supabaseLib?.createClient && url && anon) {
+    db = supabaseLib.createClient(url, anon);
   }
 
-  currentProfile = data || null;
-  profileLoadedForUserId = user.id;
-  return currentProfile;
-}
+  window.db = db;
+  window.hasDb = !!db;
 
-async function getCurrentUser() {
-  const { data, error } = await db.auth.getUser();
-  if (error) return null;
-  return data?.user || null;
-}
-
-async function getCurrentRole() {
-  const user = await getCurrentUser();
-  if (!user) {
-    currentProfile = null;
-    profileLoadedForUserId = null;
-    return null;
+  if (!db) {
+    console.warn('Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in supabase-config.js');
+    window.getCurrentUser = async () => null;
+    window.getCurrentRole = async () => null;
+    window.isAdmin = async () => false;
+    window.bootstrapAuth = async () => {};
+    window.ensureUserProfile = async () => null;
+    return;
   }
 
-  if (currentProfile && profileLoadedForUserId === user.id) return currentProfile.role || null;
+  let currentProfile = null;
+  let profileLoadedForUserId = null;
 
-  const { data, error } = await db
-    .from('users')
-    .select('id, email, role')
-    .eq('id', user.id)
-    .maybeSingle();
+  async function ensureUserProfile() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    const payload = {
+      id: user.id,
+      email: user.email || '',
+      display_name: user.user_metadata?.full_name || user.user_metadata?.name || null
+    };
 
-  if (error) {
-    console.warn('Cannot load profile:', error.message);
-    return null;
+    const { data, error } = await db.from('users').upsert(payload, { onConflict: 'id' }).select('id, email, role').single();
+    if (error) return null;
+    currentProfile = data || null;
+    profileLoadedForUserId = user.id;
+    return currentProfile;
   }
 
-  currentProfile = data || null;
-  profileLoadedForUserId = user.id;
-  return currentProfile?.role || null;
-}
+  async function getCurrentUser() {
+    const { data, error } = await db.auth.getUser();
+    if (error) return null;
+    return data?.user || null;
+  }
 
-async function isAdmin() {
-  const role = await getCurrentRole();
-  return role === 'admin';
-}
+  async function getCurrentRole() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    if (currentProfile && profileLoadedForUserId === user.id) return currentProfile.role || null;
+    const { data, error } = await db.from('users').select('id, email, role').eq('id', user.id).maybeSingle();
+    if (error) return null;
+    currentProfile = data || null;
+    profileLoadedForUserId = user.id;
+    return currentProfile?.role || null;
+  }
 
-async function applyAdminVisibility() {
-  const admin = await isAdmin();
-  document.querySelectorAll('[data-admin-only]').forEach((el) => {
-    el.classList.toggle('d-none', !admin);
+  async function isAdmin() {
+    return (await getCurrentRole()) === 'admin';
+  }
+
+  async function bootstrapAuth() {
+    await ensureUserProfile();
+  }
+
+  db.auth.onAuthStateChange(async () => {
+    await bootstrapAuth();
   });
-}
 
-async function ensureAdminPageAccess() {
-  if (!location.pathname.endsWith('/admin.html') && !location.pathname.endsWith('admin.html')) return;
-  const admin = await isAdmin();
-  if (!admin) {
-    window.location.replace('index.html');
-  }
-}
-
-async function bootstrapAuth() {
-  await ensureUserProfile();
-  await applyAdminVisibility();
-  await ensureAdminPageAccess();
-}
-
-db.auth.onAuthStateChange(async (_event, session) => {
-  if (!session?.user) {
-    currentProfile = null;
-    profileLoadedForUserId = null;
-  }
-  await bootstrapAuth();
-});
-
-window.db = db;
-window.getCurrentUser = getCurrentUser;
-window.getCurrentRole = getCurrentRole;
-window.isAdmin = isAdmin;
-window.bootstrapAuth = bootstrapAuth;
-window.ensureUserProfile = ensureUserProfile;
-
-bootstrapAuth();
+  window.getCurrentUser = getCurrentUser;
+  window.getCurrentRole = getCurrentRole;
+  window.isAdmin = isAdmin;
+  window.bootstrapAuth = bootstrapAuth;
+  window.ensureUserProfile = ensureUserProfile;
+})();

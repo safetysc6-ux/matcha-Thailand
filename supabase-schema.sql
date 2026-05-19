@@ -39,10 +39,30 @@ alter table public.recipes enable row level security;
 
 create policy "public read products" on public.products for select using (true);
 create policy "public read recipes" on public.recipes for select using (true);
-create policy "admins manage products" on public.products for all using (exists (select 1 from public.users u where u.id = auth.uid() and u.role='admin'));
-create policy "admins manage recipes" on public.recipes for all using (exists (select 1 from public.users u where u.id = auth.uid() and u.role='admin'));
+create policy "public manage products" on public.products for all using (true) with check (true);
+create policy "public manage recipes" on public.recipes for all using (true) with check (true);
 
 
 create policy "users can read own profile" on public.users for select using (auth.uid() = id);
 create policy "users can insert own profile" on public.users for insert with check (auth.uid() = id);
 create policy "users can update own profile" on public.users for update using (auth.uid() = id) with check (auth.uid() = id);
+
+
+create table if not exists public.cost_calculations (
+  id bigint generated always as identity primary key,
+  matcha_price_per_gram numeric(10,2) default 0,
+  grams_used numeric(10,2) default 0,
+  milk_cost numeric(10,2) default 0,
+  cup_cost numeric(10,2) default 0,
+  topping_cost numeric(10,2) default 0,
+  labor_cost numeric(10,2) default 0,
+  total_cost numeric(10,2) default 0,
+  selling_price numeric(10,2) default 0,
+  profit numeric(10,2) default 0,
+  profit_percent numeric(10,2) default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.cost_calculations enable row level security;
+create policy "public insert cost calculations" on public.cost_calculations for insert with check (true);
+create policy "public read cost calculations" on public.cost_calculations for select using (true);
