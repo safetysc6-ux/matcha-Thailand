@@ -1,6 +1,8 @@
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.db || window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_ANON_KEY
+);
+window.db = db;
 
 let currentProfile = null;
 let profileLoadedForUserId = null;
@@ -71,6 +73,7 @@ db.auth.onAuthStateChange(async (_event, session) => {
   await bootstrapAuth();
 });
 
+window.db = db;
 window.getCurrentUser = getCurrentUser;
 window.getCurrentRole = getCurrentRole;
 window.isAdmin = isAdmin;

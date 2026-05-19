@@ -1,4 +1,5 @@
-const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const supabaseClient = window.db || window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+window.db = supabaseClient;
 
 const thaiCurrency = (value) => new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 2 }).format(Number(value || 0));
 
